@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Edit, FileText, Download, ArrowLeft, Bot } from "lucide-react";
 import Link from "next/link";
 import { FormAnalysis, UserAnswers } from "@/types/formTypes";
+import { TutorialOverlay } from "@/components/Tutorial/TutorialOverlay";
 
 export default function ReviewPage() {
   const [formAnalysis, setFormAnalysis] = useState<FormAnalysis | null>(null);
@@ -18,6 +19,9 @@ export default function ReviewPage() {
     // Load data from localStorage
     const storedAnalysis = localStorage.getItem('formAnalysis');
     const storedAnswers = localStorage.getItem('userAnswers');
+    
+    console.log('Review page - storedAnalysis:', storedAnalysis);
+    console.log('Review page - storedAnswers:', storedAnswers);
     
     if (storedAnalysis) {
       setFormAnalysis(JSON.parse(storedAnalysis));
@@ -98,7 +102,7 @@ export default function ReviewPage() {
           </div>
 
           {/* Form Summary */}
-          <Card className="mb-8">
+          <Card className="mb-8" data-tutorial="review-summary">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-6 w-6 text-blue-600" />
@@ -214,7 +218,11 @@ export default function ReviewPage() {
             <Button variant="outline" size="lg">
               Save Draft
             </Button>
-            <Button size="lg" onClick={handleSubmit}>
+            <Button 
+              size="lg" 
+              onClick={handleSubmit}
+              data-tutorial="generate-form"
+            >
               Submit to Government
             </Button>
           </div>
@@ -228,6 +236,9 @@ export default function ReviewPage() {
           </div>
         </div>
       </div>
+      
+      {/* Tutorial Components */}
+      <TutorialOverlay currentPage="review" />
     </div>
   );
 }

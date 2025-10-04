@@ -10,6 +10,7 @@ import { ArrowLeft, CheckCircle, FileText, Download } from "lucide-react";
 import Link from "next/link";
 import { mockFormAnalysis } from "@/data/mockData";
 import { FormAnalysis, FormSearchResult } from "@/types/formTypes";
+import { TutorialOverlay } from "@/components/Tutorial/TutorialOverlay";
 
 export default function FormAnalysisPage() {
   const [selectedForm, setSelectedForm] = useState<FormSearchResult | null>(null);
@@ -93,7 +94,7 @@ export default function FormAnalysisPage() {
           {!isAnalyzing && formAnalysis && (
             <div className="space-y-6">
               {/* Analysis Summary */}
-              <Card>
+              <Card data-tutorial="analysis-overview">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <CheckCircle className="h-6 w-6 text-green-600" />
@@ -125,7 +126,11 @@ export default function FormAnalysisPage() {
 
                   <div className="flex gap-2">
                     <Link href="/conversation">
-                      <Button onClick={handleStartFilling} className="flex-1">
+                      <Button 
+                        onClick={handleStartFilling} 
+                        className="flex-1"
+                        data-tutorial="start-conversation"
+                      >
                         <FileText className="h-4 w-4 mr-2" />
                         Start Filling Form
                       </Button>
@@ -232,6 +237,9 @@ export default function FormAnalysisPage() {
           )}
         </div>
       </div>
+      
+      {/* Tutorial Components */}
+      <TutorialOverlay currentPage="analysis" />
     </div>
   );
 }

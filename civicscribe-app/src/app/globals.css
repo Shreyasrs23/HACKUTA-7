@@ -1,4 +1,14 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tutorial Styles */
+.tutorial-highlight {
+  position: relative;
+  z-index: 99;
+  border: 2px solid #3b82f6 !important;
+  border-radius: 8px;
+}
 
 @layer base {
   :root {

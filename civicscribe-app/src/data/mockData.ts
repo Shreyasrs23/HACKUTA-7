@@ -34,6 +34,72 @@ export const mockFormSearchResults: FormSearchResult[] = [
     estimatedTime: '8 minutes',
     requirements: ['Emergency status', 'Income verification', 'Address proof'],
     status: 'available'
+  },
+  {
+    id: 'medicaid-001',
+    title: 'Medicaid Application',
+    formNumber: 'MED-001',
+    source: 'CMS.gov',
+    downloadUrl: 'https://cms.gov/medicaid/application-form',
+    lastUpdated: '2024-01-05',
+    estimatedTime: '20 minutes',
+    requirements: ['Income verification', 'Citizenship status', 'Medical history', 'Insurance information'],
+    status: 'available'
+  },
+  {
+    id: 'chip-2024',
+    title: 'Children\'s Health Insurance Program',
+    formNumber: 'CHIP-2024',
+    source: 'CMS.gov',
+    downloadUrl: 'https://cms.gov/chip/application-form',
+    lastUpdated: '2024-01-08',
+    estimatedTime: '18 minutes',
+    requirements: ['Child\'s birth certificate', 'Income verification', 'Proof of residence'],
+    status: 'available'
+  },
+  {
+    id: 'aca-001',
+    title: 'Affordable Care Act Marketplace Application',
+    formNumber: 'ACA-001',
+    source: 'Healthcare.gov',
+    downloadUrl: 'https://healthcare.gov/marketplace/application',
+    lastUpdated: '2024-01-12',
+    estimatedTime: '25 minutes',
+    requirements: ['Social Security Number', 'Income information', 'Tax filing status'],
+    status: 'available'
+  },
+  {
+    id: 'housing-001',
+    title: 'Section 8 Housing Assistance Application',
+    formNumber: 'HUD-001',
+    source: 'HUD.gov',
+    downloadUrl: 'https://hud.gov/section8/application-form',
+    lastUpdated: '2023-12-20',
+    estimatedTime: '30 minutes',
+    requirements: ['Income verification', 'Background check', 'Proof of citizenship', 'Rental history'],
+    status: 'available'
+  },
+  {
+    id: 'unemployment-001',
+    title: 'Unemployment Benefits Application',
+    formNumber: 'UI-001',
+    source: 'DOL.gov',
+    downloadUrl: 'https://dol.gov/unemployment/application',
+    lastUpdated: '2024-01-15',
+    estimatedTime: '15 minutes',
+    requirements: ['Employment history', 'Reason for separation', 'Bank account information'],
+    status: 'available'
+  },
+  {
+    id: 'tax-1040',
+    title: 'Individual Income Tax Return',
+    formNumber: '1040',
+    source: 'IRS.gov',
+    downloadUrl: 'https://irs.gov/forms/1040',
+    lastUpdated: '2024-01-10',
+    estimatedTime: '45 minutes',
+    requirements: ['W-2 forms', '1099 forms', 'Bank statements', 'Receipts for deductions'],
+    status: 'available'
   }
 ];
 

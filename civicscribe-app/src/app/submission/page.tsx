@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle, ArrowLeft, Mail, Phone, ExternalLink, FileText, Bot } from "lucide-react";
 import Link from "next/link";
 import { mockSubmissionResult } from "@/data/mockData";
+import { TutorialOverlay } from "@/components/Tutorial/TutorialOverlay";
 
 export default function SubmissionPage() {
   const [submissionStatus, setSubmissionStatus] = useState<'submitting' | 'complete' | 'error'>('submitting');
@@ -84,7 +85,7 @@ export default function SubmissionPage() {
           {submissionStatus === 'complete' && (
             <div className="space-y-8">
               {/* Success Header */}
-              <div className="text-center">
+              <div className="text-center" data-tutorial="success-message">
                 <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="h-8 w-8 text-green-600" />
                 </div>
@@ -207,7 +208,11 @@ export default function SubmissionPage() {
 
               {/* Action Buttons */}
               <div className="flex justify-center gap-4">
-                <Button variant="outline" size="lg">
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  data-tutorial="download-btn"
+                >
                   <FileText className="h-4 w-4 mr-2" />
                   Download Copy
                 </Button>
@@ -251,6 +256,9 @@ export default function SubmissionPage() {
           )}
         </div>
       </div>
+      
+      {/* Tutorial Components */}
+      <TutorialOverlay currentPage="submission" />
     </div>
   );
 }

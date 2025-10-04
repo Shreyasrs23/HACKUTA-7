@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ArrowRight, Save, Eye, Bot, User } from "lucide-react";
 import Link from "next/link";
 import { FormAnalysis, FormField, UserAnswers } from "@/types/formTypes";
+import { TutorialOverlay } from "@/components/Tutorial/TutorialOverlay";
 
 export default function ConversationPage() {
   const [formAnalysis, setFormAnalysis] = useState<FormAnalysis | null>(null);
@@ -51,6 +52,9 @@ export default function ConversationPage() {
   const handleNext = () => {
     if (!currentSection || !formAnalysis) return;
     
+    // Save progress before moving to next field
+    localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
+    
     if (currentFieldIndex < currentSection.fields.length - 1) {
       setCurrentFieldIndex(currentFieldIndex + 1);
     } else if (currentSectionIndex < formAnalysis.sections.length - 1) {
@@ -73,6 +77,13 @@ export default function ConversationPage() {
     localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
     // Show success message
     alert('Progress saved successfully!');
+  };
+
+  const handleReviewAndSubmit = () => {
+    // Save all answers before navigating to review
+    localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
+    // Navigate to review page
+    window.location.href = '/review';
   };
 
   const isLastField = formAnalysis && currentSection && 
@@ -127,14 +138,14 @@ export default function ConversationPage() {
                 {completedFields} of {totalFields} fields completed
               </Badge>
             </div>
-            <Progress value={progress} className="w-full" />
+            <Progress value={progress} className="w-full" data-tutorial="progress-bar" />
             <p className="text-sm text-gray-600 mt-2">
               Section {currentSectionIndex + 1} of {formAnalysis.sections.length}: {currentSection.title}
             </p>
           </div>
 
           {/* Chat Interface */}
-          <div className="space-y-6">
+          <div className="space-y-6" data-tutorial="chat-interface">
             {/* Bot Message */}
             <Card>
               <CardContent className="p-6">
@@ -289,12 +300,13 @@ export default function ConversationPage() {
                 View Form
               </Button>
               {isLastField ? (
-                <Link href="/review">
-                  <Button>
-                    Review & Submit
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </Link>
+                <Button 
+                  onClick={handleReviewAndSubmit}
+                  data-tutorial="review-btn"
+                >
+                  Review & Submit
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
               ) : (
                 <Button onClick={handleNext}>
                   Next
@@ -305,6 +317,9 @@ export default function ConversationPage() {
           </div>
         </div>
       </div>
+      
+      {/* Tutorial Components */}
+      <TutorialOverlay currentPage="conversation" />
     </div>
   );
 }

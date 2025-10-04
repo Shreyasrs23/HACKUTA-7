@@ -51,6 +51,9 @@ export default function ConversationPage() {
   const handleNext = () => {
     if (!currentSection || !formAnalysis) return;
     
+    // Save progress before moving to next field
+    localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
+    
     if (currentFieldIndex < currentSection.fields.length - 1) {
       setCurrentFieldIndex(currentFieldIndex + 1);
     } else if (currentSectionIndex < formAnalysis.sections.length - 1) {
@@ -73,6 +76,13 @@ export default function ConversationPage() {
     localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
     // Show success message
     alert('Progress saved successfully!');
+  };
+
+  const handleReviewAndSubmit = () => {
+    // Save all answers before navigating to review
+    localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
+    // Navigate to review page
+    window.location.href = '/review';
   };
 
   const isLastField = formAnalysis && currentSection && 
@@ -289,12 +299,13 @@ export default function ConversationPage() {
                 View Form
               </Button>
               {isLastField ? (
-                <Link href="/review">
-                  <Button>
-                    Review & Submit
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </Link>
+                <Button 
+                  onClick={handleReviewAndSubmit}
+                  data-tutorial="review-btn"
+                >
+                  Review & Submit
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
               ) : (
                 <Button onClick={handleNext}>
                   Next

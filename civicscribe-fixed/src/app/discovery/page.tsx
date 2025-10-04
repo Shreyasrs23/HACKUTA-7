@@ -26,11 +26,20 @@ export default function FormDiscoveryPage() {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Filter mock results based on query
-    const filteredResults = mockFormSearchResults.filter(form =>
-      form.title.toLowerCase().includes(query.toLowerCase()) ||
-      form.requirements.some(req => req.toLowerCase().includes(query.toLowerCase()))
-    );
+    // Create a more flexible search function
+    const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+    
+    const filteredResults = mockFormSearchResults.filter(form => {
+      const searchableText = [
+        form.title.toLowerCase(),
+        form.formNumber.toLowerCase(),
+        form.source.toLowerCase(),
+        ...form.requirements.map(req => req.toLowerCase())
+      ].join(' ');
+      
+      // Check if any search term matches any part of the searchable text
+      return searchTerms.some(term => searchableText.includes(term));
+    });
     
     setSearchResults(filteredResults);
     setIsSearching(false);

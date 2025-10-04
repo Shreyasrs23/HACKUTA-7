@@ -11,6 +11,7 @@ import { ArrowLeft, Search, Download, Eye, Clock, CheckCircle, FileText, Buildin
 import Link from "next/link";
 import { mockFormSearchResults } from "@/data/mockData";
 import { FormSearchResult } from "@/types/formTypes";
+import { TutorialOverlay } from "@/components/Tutorial/TutorialOverlay";
 
 export default function FormDiscoveryPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,11 +27,20 @@ export default function FormDiscoveryPage() {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Filter mock results based on query
-    const filteredResults = mockFormSearchResults.filter(form =>
-      form.title.toLowerCase().includes(query.toLowerCase()) ||
-      form.requirements.some(req => req.toLowerCase().includes(query.toLowerCase()))
-    );
+    // Create a more flexible search function
+    const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
+    
+    const filteredResults = mockFormSearchResults.filter(form => {
+      const searchableText = [
+        form.title.toLowerCase(),
+        form.formNumber.toLowerCase(),
+        form.source.toLowerCase(),
+        ...form.requirements.map(req => req.toLowerCase())
+      ].join(' ');
+      
+      // Check if any search term matches any part of the searchable text
+      return searchTerms.some(term => searchableText.includes(term));
+    });
     
     setSearchResults(filteredResults);
     setIsSearching(false);
@@ -85,6 +95,7 @@ export default function FormDiscoveryPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch(searchQuery)}
                 className="flex-1 h-14 text-lg px-6 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
+                data-tutorial="search-input"
               />
               <Button 
                 onClick={() => handleSearch(searchQuery)}
@@ -97,7 +108,7 @@ export default function FormDiscoveryPage() {
             </div>
 
             {/* Popular Searches */}
-            <div className="mt-8">
+            <div className="mt-8" data-tutorial="popular-searches">
               <p className="text-sm text-gray-500 mb-4 font-medium">Popular searches:</p>
               <div className="flex flex-wrap gap-3 justify-center">
                 {["housing assistance", "unemployment benefits", "healthcare application", "tax forms"].map((term) => (
@@ -130,7 +141,7 @@ export default function FormDiscoveryPage() {
           )}
 
           {searchResults.length > 0 && !isSearching && (
-            <div className="space-y-4">
+            <div className="space-y-4" data-tutorial="form-results">
               <div className="text-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
                   Found {searchResults.length} official form{searchResults.length !== 1 ? 's' : ''}:
@@ -228,6 +239,9 @@ export default function FormDiscoveryPage() {
           )}
         </div>
       </div>
+      
+      {/* Tutorial Components */}
+      <TutorialOverlay currentPage="discovery" />
     </div>
   );
 }
