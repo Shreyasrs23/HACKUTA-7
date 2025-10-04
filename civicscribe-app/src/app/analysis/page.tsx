@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, CheckCircle, Clock, FileText, Download, Eye } from "lucide-react";
+import { ArrowLeft, CheckCircle, FileText, Download } from "lucide-react";
 import Link from "next/link";
 import { mockFormAnalysis } from "@/data/mockData";
 import { FormAnalysis, FormSearchResult } from "@/types/formTypes";
@@ -81,7 +81,7 @@ export default function FormAnalysisPage() {
                   Analyzing Form...
                 </h2>
                 <p className="text-gray-600 mb-4">
-                  🤖 I'm analyzing the {selectedForm?.title} form
+                  🤖 I&apos;m analyzing the {selectedForm?.title} form
                 </p>
                 <Progress value={analysisProgress} className="w-80 mx-auto" />
                 <p className="text-sm text-gray-500 mt-2">{analysisProgress}% complete</p>

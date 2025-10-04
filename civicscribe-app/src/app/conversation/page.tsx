@@ -49,11 +49,11 @@ export default function ConversationPage() {
   };
 
   const handleNext = () => {
-    if (!currentSection) return;
+    if (!currentSection || !formAnalysis) return;
     
     if (currentFieldIndex < currentSection.fields.length - 1) {
       setCurrentFieldIndex(currentFieldIndex + 1);
-    } else if (currentSectionIndex < formAnalysis!.sections.length - 1) {
+    } else if (currentSectionIndex < formAnalysis.sections.length - 1) {
       setCurrentSectionIndex(currentSectionIndex + 1);
       setCurrentFieldIndex(0);
     }
@@ -62,9 +62,9 @@ export default function ConversationPage() {
   const handlePrevious = () => {
     if (currentFieldIndex > 0) {
       setCurrentFieldIndex(currentFieldIndex - 1);
-    } else if (currentSectionIndex > 0) {
+    } else if (currentSectionIndex > 0 && formAnalysis) {
       setCurrentSectionIndex(currentSectionIndex - 1);
-      const prevSection = formAnalysis!.sections[currentSectionIndex - 1];
+      const prevSection = formAnalysis.sections[currentSectionIndex - 1];
       setCurrentFieldIndex(prevSection.fields.length - 1);
     }
   };
@@ -75,8 +75,9 @@ export default function ConversationPage() {
     alert('Progress saved successfully!');
   };
 
-  const isLastField = currentSectionIndex === formAnalysis!.sections.length - 1 && 
-                     currentFieldIndex === currentSection!.fields.length - 1;
+  const isLastField = formAnalysis && currentSection && 
+                     currentSectionIndex === formAnalysis.sections.length - 1 && 
+                     currentFieldIndex === currentSection.fields.length - 1;
 
   if (isLoading) {
     return (
