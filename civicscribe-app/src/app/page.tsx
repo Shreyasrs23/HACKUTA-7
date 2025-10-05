@@ -1,35 +1,21 @@
 // src/app/page.tsx
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Bot, Smartphone, Heart, ArrowRight, CheckCircle, Sparkles, Users, Clock, Shield } from "lucide-react";
 import Link from "next/link";
 import { TutorialOverlay, TutorialTrigger } from "@/components/Tutorial/TutorialOverlay";
+import { Header } from "@/components/Header";
+import { auth0 } from "@/lib/auth0";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth0.getSession();
+  const user = session?.user;
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Header */}
-      <header className="border-b bg-white/95 backdrop-blur-sm shadow-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
-              <Building2 className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              CivicScribe
-            </span>
-          </div>
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="#features" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">Features</Link>
-            <Link href="#how-it-works" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">How it Works</Link>
-            <Link href="#about" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">About</Link>
-            <Button variant="outline" size="sm">Sign In</Button>
-          </nav>
-        </div>
-      </header>
+      <Header user={user} />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden" data-tutorial="hero-section">
