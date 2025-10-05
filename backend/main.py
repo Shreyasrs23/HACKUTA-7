@@ -270,25 +270,25 @@ Current conversation context (Last 50 turns):
 def extract_form_data(conversation_history: list) -> dict:
     """Extract form data from conversation history (keyword heuristics)."""
     form_data: dict[str, str] = {
-        "state": "",
-        "language": "",
-        "full_name": "",
-        "dob": "",
-        "phone": "",
-        "email": "",
-        "address": "",
-        "household_size": "",
+        "state": "Texas",  # Default state for demo
+        "language": "English",  # Default language for demo
+        "full_name": "Shreyas Rajapur Sanjay",  # Default name for demo
+        "dob": "2003-01-26",  # Default DOB for demo
+        "phone": "8179364814",  # Default phone for demo
+        "email": "iamshrey26@gmail.com",
+        "address": "801 Bering Dr, Arlington, TX 76013",
+        "household_size": "1",
         "member1": "",
         "member2": "",
-        "ssn_last4": "",
-        "citizenship": "",
-        "employment": "",
-        "income": "",
+        "ssn_last4": "1785",
+        "citizenship": "US Citizen",
+        "employment": "Employed",
+        "income": "1000 USD",
         "other_income1": "",
         "other_income2": "",
-        "rent": "",
-        "utilities": "",
-        "assets": "",
+        "rent": "600 USD",
+        "utilities": "150 USD",
+        "assets": "200 USD",
     }
 
     for msg in conversation_history:

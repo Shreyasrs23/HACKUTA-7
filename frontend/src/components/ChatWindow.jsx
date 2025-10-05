@@ -22,7 +22,7 @@ const ChatWindow = ({ onBack }) => {
   const audioRef = useRef(null)
 
   // Set the target number of messages for 100% completion (15 Q + 15 A = 30)
-  const COMPLETION_TARGET = 30 
+  const COMPLETION_TARGET = 27 
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -165,16 +165,7 @@ const ChatWindow = ({ onBack }) => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setIsAudioEnabled(!isAudioEnabled)}
-                className={`p-2 rounded-lg transition-colors ${
-                  isAudioEnabled 
-                    ? 'bg-primary-100 text-primary-600' 
-                    : 'bg-gray-100 text-gray-400'
-                }`}
-              >
-                {isAudioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-              </button>
+              
               {isFormComplete && (
                 <button
                   onClick={downloadForm}
