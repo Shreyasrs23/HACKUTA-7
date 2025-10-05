@@ -36,7 +36,7 @@ export default function LandingPage() {
             ) : (
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={() => loginWithRedirect()}>Sign In</Button>
-                <Button size="sm" className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white" onClick={() => loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })}>Sign Up</Button>
+                <Button size="sm" className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white" onClick={() => loginWithRedirect()}>Sign Up</Button>
               </div>
             )}
           </nav>

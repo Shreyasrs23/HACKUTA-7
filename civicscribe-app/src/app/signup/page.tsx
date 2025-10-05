@@ -9,7 +9,7 @@ export default function SignUpPage() {
   const { loginWithRedirect } = useAuth0();
 
   useEffect(() => {
-    loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } });
+    loginWithRedirect();
   }, [loginWithRedirect]);
 
   return (
@@ -20,7 +20,7 @@ export default function SignUpPage() {
           <CardDescription>If you are not redirected, click the button below.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button onClick={() => loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })}>Continue to Auth0</Button>
+          <Button onClick={() => loginWithRedirect()}>Continue to Auth0</Button>
         </CardContent>
       </Card>
     </div>

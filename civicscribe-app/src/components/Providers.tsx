@@ -6,7 +6,6 @@ import { Auth0Provider } from "@auth0/auth0-react";
 
 const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN as string | undefined;
 const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID as string | undefined;
-const audience = process.env.NEXT_PUBLIC_AUTH0_AUDIENCE as string | undefined;
 const redirectUri = typeof window !== "undefined" ? window.location.origin : undefined;
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -21,7 +20,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       clientId={clientId}
       authorizationParams={{
         redirect_uri: redirectUri,
-        audience,
       }}
       cacheLocation="localstorage"
     >
