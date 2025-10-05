@@ -7,10 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Building2, Bot, Smartphone, Heart, ArrowRight, CheckCircle, Sparkles, Users, Clock, Shield } from "lucide-react";
 import Link from "next/link";
 import { TutorialOverlay, TutorialTrigger } from "@/components/Tutorial/TutorialOverlay";
-import { useAuth } from "@/components/Auth/AuthProvider";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function LandingPage() {
-  const { user, signOut } = useAuth();
+  const { isAuthenticated, user, loginWithRedirect, logout, isLoading } = useAuth0();
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Header */}
@@ -28,19 +28,15 @@ export default function LandingPage() {
             <Link href="#features" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">Features</Link>
             <Link href="#how-it-works" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">How it Works</Link>
             <Link href="#about" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">About</Link>
-            {user ? (
+            {isAuthenticated ? (
               <div className="flex items-center gap-2">
-                <span className="text-gray-700 text-sm">Hi, {user.name}</span>
-                <Button variant="outline" size="sm" onClick={signOut}>Sign Out</Button>
+                <span className="text-gray-700 text-sm">Hi, {user?.name || user?.email}</span>
+                <Button variant="outline" size="sm" onClick={() => logout({ returnTo: window.location.origin })}>Sign Out</Button>
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Link href="/signin">
-                  <Button variant="outline" size="sm">Sign In</Button>
-                </Link>
-                <Link href="/signup">
-                  <Button size="sm" className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">Sign Up</Button>
-                </Link>
+                <Button variant="outline" size="sm" onClick={() => loginWithRedirect()}>Sign In</Button>
+                <Button size="sm" className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white" onClick={() => loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })}>Sign Up</Button>
               </div>
             )}
           </nav>
