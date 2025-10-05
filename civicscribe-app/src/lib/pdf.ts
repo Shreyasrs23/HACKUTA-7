@@ -49,48 +49,64 @@ export async function downloadFilledOriginal(
   try {
     if (!form.downloadUrl) throw new Error("No source URL");
     const res = await fetch(`/api/proxy-pdf?url=${encodeURIComponent(form.downloadUrl)}`);
-    if (!res.ok) throw new Error("Failed to fetch original PDF");
-    const array = await res.arrayBuffer();
-
-    const pdfDoc = await PDFDocument.load(array, { updateMetadata: false });
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const pages = pdfDoc.getPages();
-    const page = pages[0] || pdfDoc.addPage();
-    let { height } = page.getSize();
-
-    // Draw a small banner marking it filled by app
-    page.drawText("Filled by CivicScribe", {
-      x: 40,
-      y: height - 40,
-      size: 10,
-      font,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-
-    // Simple overlay of label: value (without absolute coordinates)
-    let y = height - 60;
-    const lineHeight = 12;
-    for (const section of analysis.sections) {
-      page.drawText(section.title, { x: 40, y, size: 11, font, color: rgb(0, 0, 0.5) });
-      y -= lineHeight;
-      for (const field of section.fields) {
-        const label = field.mapping.formField;
-        const value = (answers as any)[field.id] ?? "";
-        page.drawText(`${label}: ${String(value)}`, { x: 50, y, size: 10, font, color: rgb(0, 0, 0) });
-        y -= lineHeight;
-        if (y < 60) {
-          const newPage = pdfDoc.addPage();
-          y = newPage.getSize().height - 50;
-        }
-      }
-      y -= 4;
+    if (!res.ok) {
+      // Attempt to fetch the URL directly if proxy fails (in case same-origin during dev)
+      const direct = await fetch(form.downloadUrl);
+      if (!direct.ok) throw new Error("Failed to fetch original PDF");
+      const arr = await direct.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arr, { updateMetadata: false });
+      await overlayForm(pdfDoc, analysis, answers);
+      const out = await pdfDoc.save();
+      triggerDownload(out, `${sanitizeFileName(form.title || "filled_form")}_filled.pdf`);
+      return;
     }
-
+    const array = await res.arrayBuffer();
+    const pdfDoc = await PDFDocument.load(array, { updateMetadata: false });
+    await overlayForm(pdfDoc, analysis, answers);
     const outBytes = await pdfDoc.save();
     triggerDownload(outBytes, `${sanitizeFileName(form.title || "filled_form")}_filled.pdf`);
   } catch (err) {
     console.error("Filling original PDF failed, falling back to summary", err);
     await downloadSummaryPdf(form.title, analysis, answers);
+  }
+}
+
+async function overlayForm(
+  pdfDoc: PDFDocument,
+  analysis: FormAnalysis,
+  answers: UserAnswers
+) {
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const pages = pdfDoc.getPages();
+  const page = pages[0] || pdfDoc.addPage();
+  let { height } = page.getSize();
+
+  // Draw a small banner marking it filled by app
+  page.drawText("Filled by CivicScribe", {
+    x: 40,
+    y: height - 40,
+    size: 10,
+    font,
+    color: rgb(0.2, 0.2, 0.2),
+  });
+
+  // Simple overlay of label: value (without absolute coordinates)
+  let y = height - 60;
+  const lineHeight = 12;
+  for (const section of analysis.sections) {
+    page.drawText(section.title, { x: 40, y, size: 11, font, color: rgb(0, 0, 0.5) });
+    y -= lineHeight;
+    for (const field of section.fields) {
+      const label = field.mapping.formField;
+      const value = (answers as any)[field.id] ?? "";
+      page.drawText(`${label}: ${String(value)}`, { x: 50, y, size: 10, font, color: rgb(0, 0, 0) });
+      y -= lineHeight;
+      if (y < 60) {
+        const newPage = pdfDoc.addPage();
+        y = newPage.getSize().height - 50;
+      }
+    }
+    y -= 4;
   }
 }
 
