@@ -3,11 +3,17 @@
 
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { auth0 } from "@/lib/auth0";
 
 export async function middleware(request: NextRequest) {
-  // Delegate to the no-op auth0 wrapper to maintain compatibility
-  return auth0.middleware(request);
+  const { pathname } = request.nextUrl;
+  // Redirect any legacy Auth0 routes to our local auth pages
+  if (pathname.startsWith("/auth/login")) {
+    return NextResponse.redirect(new URL("/signin", request.url));
+  }
+  if (pathname.startsWith("/auth/signup") || pathname.startsWith("/auth/register")) {
+    return NextResponse.redirect(new URL("/signup", request.url));
+  }
+  return NextResponse.next();
 }
 
 // Optionally limit to routes if desired

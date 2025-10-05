@@ -13,4 +13,11 @@ export const auth0 = {
   async getSession() {
     return null;
   },
+  // Redirect helpers emulating Auth0 SDK routes
+  loginUrl() {
+    return "/signin";
+  },
+  signupUrl() {
+    return "/signup";
+  },
 };
