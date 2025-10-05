@@ -11,7 +11,6 @@ import { ArrowLeft, ArrowRight, Save, Eye, Bot, User } from "lucide-react";
 import Link from "next/link";
 import { FormAnalysis, FormField, UserAnswers, FormSearchResult } from "@/types/formTypes";
 import { TutorialOverlay } from "@/components/Tutorial/TutorialOverlay";
-import { extractAnswersFromText } from "@/lib/nlp";
 
 export default function ConversationPage() {
   const [formAnalysis, setFormAnalysis] = useState<FormAnalysis | null>(null);
@@ -289,23 +288,7 @@ export default function ConversationPage() {
                           ))}
                         </div>
                       )}
-                      {/* Natural language capture */}
-                      <div className="pt-2">
-                        <Input
-                          placeholder="Type in plain English, e.g., 'My name is Jane Doe and my SSN is 123-45-6789'"
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && formAnalysis) {
-                              const value = (e.target as HTMLInputElement).value;
-                              const extracted = extractAnswersFromText(value, formAnalysis);
-                              if (Object.keys(extracted).length > 0) {
-                                setUserAnswers(prev => ({ ...prev, ...extracted }));
-                                (e.target as HTMLInputElement).value = '';
-                              }
-                            }
-                          }}
-                        />
-                        <p className="text-xs text-gray-500 mt-1">Press Enter to auto-fill recognized fields.</p>
-                      </div>
+                      
                     </div>
                   </div>
                 </div>
