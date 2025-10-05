@@ -39,6 +39,20 @@ export default function ConversationPage() {
     setIsLoading(false);
   }, []);
 
+  // If coming from review with an editSection index, jump there
+  useEffect(() => {
+    if (!formAnalysis) return;
+    const editSectionIndex = localStorage.getItem('editSection');
+    if (editSectionIndex) {
+      const idx = parseInt(editSectionIndex, 10);
+      if (!Number.isNaN(idx) && idx >= 0 && idx < formAnalysis.sections.length) {
+        setCurrentSectionIndex(idx);
+        setCurrentFieldIndex(0);
+      }
+      localStorage.removeItem('editSection');
+    }
+  }, [formAnalysis]);
+
   const currentSection = formAnalysis?.sections[currentSectionIndex];
   const currentField = currentSection?.fields[currentFieldIndex];
   const totalFields = formAnalysis?.sections.reduce((acc, section) => acc + section.fields.length, 0) || 0;
@@ -79,9 +93,18 @@ export default function ConversationPage() {
   };
 
   const handleSaveProgress = () => {
-    localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
-    // Show success message
-    alert('Progress saved successfully!');
+    try {
+      localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
+      localStorage.setItem('progress_meta', JSON.stringify({
+        currentSectionIndex,
+        currentFieldIndex,
+        savedAt: new Date().toISOString(),
+      }));
+      alert('Progress saved successfully!');
+    } catch (e) {
+      console.error('Failed to save progress', e);
+      alert('Failed to save progress.');
+    }
   };
 
   const handleReviewAndSubmit = () => {

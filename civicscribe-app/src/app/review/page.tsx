@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { jsPDF } from "jspdf";
+import { downloadFilledOriginal, downloadSummaryPdf } from "@/lib/pdf";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Edit, FileText, Download, ArrowLeft, Bot } from "lucide-react";
@@ -48,39 +49,25 @@ export default function ReviewPage() {
     window.location.href = '/conversation';
   };
 
-  const handleDownloadPdf = () => {
+  const handleSaveProgress = () => {
+    try {
+      localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
+      localStorage.setItem('formAnalysis', JSON.stringify(formAnalysis));
+      alert('Progress saved.');
+    } catch (e) {
+      console.error('Save failed', e);
+      alert('Failed to save.');
+    }
+  };
+
+  const handleDownloadPdf = async () => {
     if (!formAnalysis) return;
-    const doc = new jsPDF();
-    const marginLeft = 14;
-    let cursorY = 20;
-
-    const addLine = (text: string) => {
-      const lines = doc.splitTextToSize(text, 180);
-      lines.forEach((line) => {
-        if (cursorY > 280) {
-          doc.addPage();
-          cursorY = 20;
-        }
-        doc.text(line, marginLeft, cursorY);
-        cursorY += 7;
-      });
-    };
-
-    addLine(selectedForm?.title || "Form Application");
-    addLine("");
-
-    formAnalysis.sections.forEach((section) => {
-      addLine(`== ${section.title} ==`);
-      section.fields.forEach((field) => {
-        const label = field.mapping.formField;
-        const value = (userAnswers as any)[field.id] ?? "";
-        addLine(`${label}: ${value}`);
-      });
-      addLine("");
-    });
-
-    const filename = (selectedForm?.title || "application").replace(/\s+/g, "_") + ".pdf";
-    doc.save(filename);
+    // Try to fill the original form; fall back to summary
+    if (selectedForm) {
+      await downloadFilledOriginal(selectedForm, formAnalysis, userAnswers);
+    } else {
+      await downloadSummaryPdf('Form Application', formAnalysis, userAnswers);
+    }
   };
 
   const handleSaveDraft = () => {
@@ -273,6 +260,9 @@ export default function ReviewPage() {
             </Button>
             <Button variant="outline" size="lg" onClick={handleSaveDraft} disabled={isSaving}>
               Save Draft
+            </Button>
+            <Button variant="outline" size="lg" onClick={handleSaveProgress}>
+              Save Progress
             </Button>
             <Button 
               size="lg" 
