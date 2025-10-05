@@ -7,6 +7,7 @@ import './index.css'
 const domain = import.meta.env.VITE_AUTH0_DOMAIN
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID
 const audience = import.meta.env.VITE_AUTH0_AUDIENCE
+const apiBase = import.meta.env.VITE_API_BASE
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
