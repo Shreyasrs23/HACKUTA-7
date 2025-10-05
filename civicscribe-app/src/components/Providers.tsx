@@ -5,7 +5,13 @@ import { TutorialProvider } from "@/components/Tutorial/TutorialProvider";
 import { Auth0Provider } from "@auth0/auth0-react";
 
 const safeTrim = (v?: string) => (typeof v === "string" ? v.trim() : undefined);
-const domain = safeTrim(process.env.NEXT_PUBLIC_AUTH0_DOMAIN as string | undefined);
+const normalizeDomain = (input?: string) => {
+  const v = safeTrim(input);
+  if (!v) return undefined;
+  // Remove protocol and trailing slashes if provided erroneously
+  return v.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+};
+const domain = normalizeDomain(process.env.NEXT_PUBLIC_AUTH0_DOMAIN as string | undefined);
 const clientId = safeTrim(process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID as string | undefined);
 const redirectUri = typeof window !== "undefined" ? window.location.origin : undefined;
 
