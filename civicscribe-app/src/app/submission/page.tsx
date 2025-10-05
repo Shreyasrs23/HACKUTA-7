@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle, ArrowLeft, Mail, Phone, ExternalLink, FileText, Bot } from "lucide-react";
 import Link from "next/link";
 import { mockSubmissionResult } from "@/data/mockData";
+import { jsPDF } from "jspdf";
 import { TutorialOverlay } from "@/components/Tutorial/TutorialOverlay";
 
 export default function SubmissionPage() {
@@ -16,6 +17,20 @@ export default function SubmissionPage() {
   const [submissionProgress, setSubmissionProgress] = useState(0);
   const [submissionResult, setSubmissionResult] = useState(mockSubmissionResult);
   const [selectedFormTitle, setSelectedFormTitle] = useState<string | null>(null);
+  const handleDownloadCopy = () => {
+    const doc = new jsPDF();
+    let y = 20;
+    const add = (t: string) => { doc.text(t, 14, y); y += 8; if (y > 280) { doc.addPage(); y = 20; } };
+    add(`Application: ${selectedFormTitle || 'Application'}`);
+    add(`Application ID: ${submissionResult.applicationId}`);
+    add(`Submitted: ${new Date(submissionResult.confirmation.submittedAt).toLocaleString()}`);
+    add(`Expected Response: ${submissionResult.confirmation.expectedResponse}`);
+    add("");
+    add("Next Steps:");
+    submissionResult.nextSteps.forEach((s, i) => add(`${i + 1}. ${s}`));
+    const filename = `${(selectedFormTitle || 'application').replace(/\s+/g,'_')}_submission.pdf`;
+    doc.save(filename);
+  };
 
   useEffect(() => {
     const storedForm = localStorage.getItem('selectedForm');
@@ -220,6 +235,7 @@ export default function SubmissionPage() {
                   variant="outline" 
                   size="lg"
                   data-tutorial="download-btn"
+                  onClick={handleDownloadCopy}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Download Copy

@@ -154,7 +154,14 @@ export default function FormAnalysisPage() {
                         Start Filling Form
                       </Button>
                     </Link>
-                    <Button variant="outline">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        if (selectedForm?.downloadUrl) {
+                          window.open(selectedForm.downloadUrl, '_blank');
+                        }
+                      }}
+                    >
                       <Download className="h-4 w-4 mr-2" />
                       Download Original
                     </Button>
