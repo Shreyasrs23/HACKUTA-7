@@ -17,13 +17,27 @@ export default function SubmissionPage() {
   const [submissionProgress, setSubmissionProgress] = useState(0);
   const [submissionResult, setSubmissionResult] = useState(mockSubmissionResult);
   const [selectedFormTitle, setSelectedFormTitle] = useState<string | null>(null);
+  const formatDateForUI = (iso: string) => {
+    try {
+      return new Date(iso).toLocaleString('en-US', {
+        timeZone: 'UTC',
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return iso;
+    }
+  };
   const handleDownloadCopy = () => {
     const doc = new jsPDF();
     let y = 20;
     const add = (t: string) => { doc.text(t, 14, y); y += 8; if (y > 280) { doc.addPage(); y = 20; } };
     add(`Application: ${selectedFormTitle || 'Application'}`);
     add(`Application ID: ${submissionResult.applicationId}`);
-    add(`Submitted: ${new Date(submissionResult.confirmation.submittedAt).toLocaleString()}`);
+    add(`Submitted: ${formatDateForUI(submissionResult.confirmation.submittedAt)}`);
     add(`Expected Response: ${submissionResult.confirmation.expectedResponse}`);
     add("");
     add("Next Steps:");
@@ -137,9 +151,7 @@ export default function SubmissionPage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Submitted:</span>
-                        <span className="font-medium">
-                          {new Date(submissionResult.confirmation.submittedAt).toLocaleString()}
-                        </span>
+                        <span className="font-medium">{formatDateForUI(submissionResult.confirmation.submittedAt)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Status:</span>
