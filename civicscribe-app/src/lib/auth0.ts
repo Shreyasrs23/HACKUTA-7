@@ -1,12 +1,16 @@
 // src/lib/auth0.ts
-// Wrapper that prefers real Auth0 server SDK if installed, else uses no-op shim.
+// No-op Auth0 wrapper used for local/demo builds.
+// Provides a compatible API for middleware.ts and other call sites.
 
-// The path alias in tsconfig points '@auth0/nextjs-auth0/server' to our shim
-// so importing from it will work locally without the dependency.
-import { Auth0Client } from "@auth0/nextjs-auth0/server";
+import { NextResponse } from "next/server";
 
-export const auth0 = new Auth0Client({
-  domain: process.env.AUTH0_DOMAIN,
-  clientId: process.env.AUTH0_CLIENT_ID,
-  audience: process.env.AUTH0_AUDIENCE,
-});
+export const auth0 = {
+  // Neutral middleware that simply lets the request pass through
+  async middleware(_req: any) {
+    return NextResponse.next();
+  },
+  // Session getter placeholder
+  async getSession() {
+    return null;
+  },
+};
