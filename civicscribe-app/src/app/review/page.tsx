@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { jsPDF } from "jspdf";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Edit, FileText, Download, ArrowLeft, Bot } from "lucide-react";
@@ -15,6 +16,7 @@ export default function ReviewPage() {
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
   const [isLoading, setIsLoading] = useState(true);
   const [selectedForm, setSelectedForm] = useState<FormSearchResult | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     // Load data from localStorage
@@ -44,6 +46,57 @@ export default function ReviewPage() {
     localStorage.setItem('editSection', sectionIndex.toString());
     // Navigate back to conversation page
     window.location.href = '/conversation';
+  };
+
+  const handleDownloadPdf = () => {
+    if (!formAnalysis) return;
+    const doc = new jsPDF();
+    const marginLeft = 14;
+    let cursorY = 20;
+
+    const addLine = (text: string) => {
+      const lines = doc.splitTextToSize(text, 180);
+      lines.forEach((line) => {
+        if (cursorY > 280) {
+          doc.addPage();
+          cursorY = 20;
+        }
+        doc.text(line, marginLeft, cursorY);
+        cursorY += 7;
+      });
+    };
+
+    addLine(selectedForm?.title || "Form Application");
+    addLine("");
+
+    formAnalysis.sections.forEach((section) => {
+      addLine(`== ${section.title} ==`);
+      section.fields.forEach((field) => {
+        const label = field.mapping.formField;
+        const value = (userAnswers as any)[field.id] ?? "";
+        addLine(`${label}: ${value}`);
+      });
+      addLine("");
+    });
+
+    const filename = (selectedForm?.title || "application").replace(/\s+/g, "_") + ".pdf";
+    doc.save(filename);
+  };
+
+  const handleSaveDraft = () => {
+    setIsSaving(true);
+    try {
+      const draft = {
+        form: selectedForm,
+        analysis: formAnalysis,
+        answers: userAnswers,
+        savedAt: new Date().toISOString(),
+      };
+      localStorage.setItem("draft_application", JSON.stringify(draft));
+      alert("Draft saved locally.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleSubmit = () => {
@@ -214,11 +267,11 @@ export default function ReviewPage() {
 
           {/* Action Buttons */}
           <div className="flex justify-center gap-4">
-            <Button variant="outline" size="lg">
+            <Button variant="outline" size="lg" onClick={handleDownloadPdf}>
               <Download className="h-4 w-4 mr-2" />
               Download PDF
             </Button>
-            <Button variant="outline" size="lg">
+            <Button variant="outline" size="lg" onClick={handleSaveDraft} disabled={isSaving}>
               Save Draft
             </Button>
             <Button 
