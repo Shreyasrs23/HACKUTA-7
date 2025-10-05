@@ -1,6 +1,4 @@
 import os
-import uuid
-from datetime import datetime
 from typing import Optional
 from dotenv import load_dotenv
 
@@ -10,7 +8,6 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 import jwt
 from jwt import PyJWKClient
-import requests
 
 from supabase import create_client, Client
 import google.generativeai as genai
@@ -37,7 +34,8 @@ supabase: Client = create_client(
 )
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-gemini_model = genai.GenerativeModel('gemini-pro')
+# --- FIX 1: Use a current, valid model name ---
+gemini_model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
 # Auth0 configuration
 AUTH0_DOMAIN = os.getenv("AUTH0_DOMAIN")
@@ -56,26 +54,13 @@ class ChatResponse(BaseModel):
     reply: str
     session_id: str
 
-class User(BaseModel):
-    id: str
-    auth0_sub: str
-
 # Auth0 JWT validation
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
-    """
-    Verify and decode Auth0 JWT token
-    """
     token = credentials.credentials
-    
     try:
-        # Get the JWKS from Auth0
         jwks_url = f"https://{AUTH0_DOMAIN}/.well-known/jwks.json"
         jwks_client = PyJWKClient(jwks_url)
-        
-        # Get the signing key
         signing_key = jwks_client.get_signing_key_from_jwt(token)
-        
-        # Decode and verify the token
         payload = jwt.decode(
             token,
             signing_key.key,
@@ -83,48 +68,27 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) 
             audience=AUTH0_AUDIENCE,
             issuer=f"https://{AUTH0_DOMAIN}/"
         )
-        
         return payload
-    
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired"
-        )
-    except jwt.JWTClaimsError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token claims"
-        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Unable to validate token: {str(e)}"
         )
 
+# --- IMPROVEMENT 1: Use a single 'upsert' operation for efficiency ---
 def get_or_create_user(auth0_sub: str) -> str:
     """
-    Get existing user or create a new one based on Auth0 subject ID
+    Get existing user or create a new one using a single upsert operation.
     """
-    # Check if user exists
-    result = supabase.table("users").select("*").eq("auth0_sub", auth0_sub).execute()
-    
-    if result.data and len(result.data) > 0:
-        return result.data[0]["id"]
-    
-    # Create new user
-    new_user = supabase.table("users").insert({
+    result = supabase.table("users").upsert({
         "auth0_sub": auth0_sub
     }).execute()
     
-    return new_user.data[0]["id"]
+    return result.data[0]["id"]
 
 # Routes
 @app.get("/")
 def health_check():
-    """
-    Health check endpoint
-    """
     return {"status": "Running"}
 
 @app.post("/chat", response_model=ChatResponse)
@@ -132,55 +96,41 @@ def chat(
     request: ChatRequest,
     token_payload: dict = Depends(verify_token)
 ):
-    """
-    Core chat endpoint with Auth0 authentication
-    """
     try:
-        # Get or create user
         auth0_sub = token_payload.get("sub")
         user_id = get_or_create_user(auth0_sub)
         
-        # Handle session
         session_id = request.session_id
-        
         if not session_id:
-            # Create new application session
             new_session = supabase.table("applications").insert({
                 "user_id": user_id,
-                "form_type": "SNAP"
+                "form_type": "SNAP" # This can be made dynamic later
             }).execute()
             session_id = new_session.data[0]["id"]
         
-        # Save user message to conversation history
         supabase.table("conversation_history").insert({
             "application_id": session_id,
             "sender": "user",
             "message": request.message
         }).execute()
         
-        # Get conversation history for context
+        # --- IMPROVEMENT 2: Fetch only the last 10 messages for context ---
         history = supabase.table("conversation_history")\
             .select("*")\
             .eq("application_id", session_id)\
-            .order("created_at")\
+            .order("created_at", desc=True)\
+            .limit(10)\
             .execute()
         
+        # Reverse the order to be chronological
+        recent_messages = reversed(history.data)
+
         # Build context for Gemini
-        conversation_context = "You are a helpful assistant helping users fill out a SNAP (Food Assistance) application form. Ask questions one at a time to gather the necessary information. Be friendly and conversational.\n\n"
-        conversation_context += "Form fields needed:\n"
-        conversation_context += "- Full Name\n"
-        conversation_context += "- Date of Birth\n"
-        conversation_context += "- Address\n"
-        conversation_context += "- Phone Number\n"
-        conversation_context += "- Number of Household Members\n"
-        conversation_context += "- Monthly Income\n\n"
+        conversation_context = "You are a helpful assistant for CivicScribe. Help users fill out a SNAP form by asking friendly, one-at-a-time questions.\n\n"
         conversation_context += "Previous conversation:\n"
         
-        for msg in history.data[:-1]:  # Exclude the message we just added
+        for msg in recent_messages:
             conversation_context += f"{msg['sender']}: {msg['message']}\n"
-        
-        conversation_context += f"user: {request.message}\n"
-        conversation_context += "ai: "
         
         # Get AI response from Gemini
         response = gemini_model.generate_content(conversation_context)
