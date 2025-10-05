@@ -107,6 +107,14 @@ export default function ConversationPage() {
     }
   };
 
+  const handleViewForm = () => {
+    if (selectedForm?.downloadUrl) {
+      window.open(selectedForm.downloadUrl, '_blank');
+    } else {
+      alert('Original form URL not available.');
+    }
+  };
+
   const handleReviewAndSubmit = () => {
     // Save all answers before navigating to review
     localStorage.setItem('userAnswers', JSON.stringify(userAnswers));
@@ -323,7 +331,7 @@ export default function ConversationPage() {
             </div>
             
             <div className="flex gap-2">
-              <Button variant="outline">
+              <Button variant="outline" onClick={handleViewForm}>
                 <Eye className="h-4 w-4 mr-2" />
                 View Form
               </Button>
