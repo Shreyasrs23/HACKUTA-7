@@ -41,7 +41,6 @@ CivicScribe is a universal, AI-powered web application that helps users fill out
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd civic-scribe
    ```
 
 2. **Set up the backend**
