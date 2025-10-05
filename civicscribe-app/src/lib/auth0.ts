@@ -1,11 +1,12 @@
 // src/lib/auth0.ts
-// Lightweight stub to avoid external Auth0 dependency in this demo.
-// Replace with real SDK integration if needed.
+// Wrapper that prefers real Auth0 server SDK if installed, else uses no-op shim.
 
-export class Auth0Client {
-  async getSession(): Promise<null> {
-    return null;
-  }
-}
+// The path alias in tsconfig points '@auth0/nextjs-auth0/server' to our shim
+// so importing from it will work locally without the dependency.
+import { Auth0Client } from "@auth0/nextjs-auth0/server";
 
-export const auth0 = new Auth0Client();
+export const auth0 = new Auth0Client({
+  domain: process.env.AUTH0_DOMAIN,
+  clientId: process.env.AUTH0_CLIENT_ID,
+  audience: process.env.AUTH0_AUDIENCE,
+});
