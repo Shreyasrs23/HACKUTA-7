@@ -7,18 +7,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Edit, FileText, Download, ArrowLeft, Bot } from "lucide-react";
 import Link from "next/link";
-import { FormAnalysis, UserAnswers } from "@/types/formTypes";
+import { FormAnalysis, UserAnswers, FormSearchResult } from "@/types/formTypes";
 import { TutorialOverlay } from "@/components/Tutorial/TutorialOverlay";
 
 export default function ReviewPage() {
   const [formAnalysis, setFormAnalysis] = useState<FormAnalysis | null>(null);
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedForm, setSelectedForm] = useState<FormSearchResult | null>(null);
 
   useEffect(() => {
     // Load data from localStorage
     const storedAnalysis = localStorage.getItem('formAnalysis');
     const storedAnswers = localStorage.getItem('userAnswers');
+    const storedForm = localStorage.getItem('selectedForm');
     
     console.log('Review page - storedAnalysis:', storedAnalysis);
     console.log('Review page - storedAnswers:', storedAnswers);
@@ -28,6 +30,9 @@ export default function ReviewPage() {
     }
     if (storedAnswers) {
       setUserAnswers(JSON.parse(storedAnswers));
+    }
+    if (storedForm) {
+      setSelectedForm(JSON.parse(storedForm));
     }
     
     setIsLoading(false);
@@ -92,11 +97,9 @@ export default function ReviewPage() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Review Your Application
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Review Your Application</h1>
             <p className="text-lg text-gray-600 mb-6">
-              🤖 I've filled out your SNAP Benefits Application based on your answers. 
+              🤖 I've filled out your {selectedForm?.title || 'application'} based on your answers. 
               Please review everything before I submit it to the government.
             </p>
           </div>
@@ -106,7 +109,7 @@ export default function ReviewPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-6 w-6 text-blue-600" />
-                SNAP Benefits Application - Form SNAP-001
+                {selectedForm?.title || 'Form Application'}{selectedForm?.formNumber ? ` - Form ${selectedForm.formNumber}` : ''}
               </CardTitle>
               <CardDescription>
                 Review all sections before submission
@@ -223,7 +226,7 @@ export default function ReviewPage() {
               onClick={handleSubmit}
               data-tutorial="generate-form"
             >
-              Submit to Government
+              Submit {selectedForm?.title ? `(${selectedForm.title})` : 'to Government'}
             </Button>
           </div>
 

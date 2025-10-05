@@ -44,11 +44,30 @@ export default function FormAnalysisPage() {
       }
 
       setIsAnalyzing(false);
-      setFormAnalysis(mockFormAnalysis);
+      const generated = generateFormAnalysis(selectedForm);
+      setFormAnalysis(generated);
     };
 
     analyzeForm();
   }, []);
+
+  const generateFormAnalysis = (form: FormSearchResult | null): FormAnalysis => {
+    const base: FormAnalysis = JSON.parse(JSON.stringify(mockFormAnalysis));
+    base.formId = form?.id || base.formId;
+    base.sections = base.sections.map(section => ({
+      ...section,
+      fields: section.fields.map(field => {
+        if (field.id === 'ssn') {
+          return {
+            ...field,
+            helpText: `This is required for the ${form?.title || 'application'}`,
+          };
+        }
+        return field;
+      }),
+    }));
+    return base;
+  };
 
   const handleStartFilling = () => {
     // Store analysis data for next page

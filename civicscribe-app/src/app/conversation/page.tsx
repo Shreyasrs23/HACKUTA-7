@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ArrowRight, Save, Eye, Bot, User } from "lucide-react";
 import Link from "next/link";
-import { FormAnalysis, FormField, UserAnswers } from "@/types/formTypes";
+import { FormAnalysis, FormField, UserAnswers, FormSearchResult } from "@/types/formTypes";
 import { TutorialOverlay } from "@/components/Tutorial/TutorialOverlay";
 
 export default function ConversationPage() {
@@ -18,17 +18,22 @@ export default function ConversationPage() {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedForm, setSelectedForm] = useState<FormSearchResult | null>(null);
 
   useEffect(() => {
     // Load form analysis from localStorage
     const storedAnalysis = localStorage.getItem('formAnalysis');
     const storedAnswers = localStorage.getItem('userAnswers');
+    const storedForm = localStorage.getItem('selectedForm');
     
     if (storedAnalysis) {
       setFormAnalysis(JSON.parse(storedAnalysis));
     }
     if (storedAnswers) {
       setUserAnswers(JSON.parse(storedAnswers));
+    }
+    if (storedForm) {
+      setSelectedForm(JSON.parse(storedForm));
     }
     
     setIsLoading(false);
@@ -132,7 +137,7 @@ export default function ConversationPage() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-gray-900">
-                {formAnalysis.formId === 'snap-001' ? 'SNAP Benefits Application' : 'Form Application'}
+                {selectedForm?.title || 'Form Application'}
               </h1>
               <Badge variant="outline">
                 {completedFields} of {totalFields} fields completed

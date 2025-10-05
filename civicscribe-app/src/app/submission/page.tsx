@@ -15,8 +15,16 @@ export default function SubmissionPage() {
   const [submissionStatus, setSubmissionStatus] = useState<'submitting' | 'complete' | 'error'>('submitting');
   const [submissionProgress, setSubmissionProgress] = useState(0);
   const [submissionResult, setSubmissionResult] = useState(mockSubmissionResult);
+  const [selectedFormTitle, setSelectedFormTitle] = useState<string | null>(null);
 
   useEffect(() => {
+    const storedForm = localStorage.getItem('selectedForm');
+    if (storedForm) {
+      try {
+        const parsed = JSON.parse(storedForm);
+        setSelectedFormTitle(parsed?.title ?? null);
+      } catch {}
+    }
     // Simulate submission process
     const submitForm = async () => {
       const steps = [
@@ -73,7 +81,7 @@ export default function SubmissionPage() {
                   Submitting Your Application...
                 </h2>
                 <p className="text-gray-600 mb-4">
-                  🤖 Submitting your SNAP Benefits Application to the USDA government portal...
+                  🤖 Submitting your {selectedFormTitle || 'application'} to the government portal...
                 </p>
                 <Progress value={submissionProgress} className="w-80 mx-auto" />
                 <p className="text-sm text-gray-500 mt-2">{submissionProgress}% complete</p>
@@ -93,7 +101,7 @@ export default function SubmissionPage() {
                   Submission Successful!
                 </h1>
                 <p className="text-lg text-gray-600">
-                  Your SNAP Benefits Application has been submitted to the government.
+                  Your {selectedFormTitle || 'application'} has been submitted to the government.
                 </p>
               </div>
 
@@ -191,7 +199,7 @@ export default function SubmissionPage() {
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900 mb-2">Congratulations!</h3>
                       <p className="text-gray-600 mb-4">
-                        I've successfully submitted your SNAP Benefits Application to the USDA government portal. 
+                        I've successfully submitted your {selectedFormTitle || 'application'} to the government portal. 
                         You should receive a confirmation letter within 7 days, and your interview will be scheduled 
                         for January 22, 2024. Don't forget to bring your required documents!
                       </p>

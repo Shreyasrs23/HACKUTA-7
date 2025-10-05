@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Building2, Bot, Smartphone, Heart, ArrowRight, CheckCircle, Sparkles, Users, Clock, Shield } from "lucide-react";
 import Link from "next/link";
 import { TutorialOverlay, TutorialTrigger } from "@/components/Tutorial/TutorialOverlay";
+import { useAuth } from "@/components/Auth/AuthProvider";
 
 export default function LandingPage() {
+  const { user, signOut } = useAuth();
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Header */}
@@ -26,7 +28,21 @@ export default function LandingPage() {
             <Link href="#features" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">Features</Link>
             <Link href="#how-it-works" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">How it Works</Link>
             <Link href="#about" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">About</Link>
-            <Button variant="outline" size="sm">Sign In</Button>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className="text-gray-700 text-sm">Hi, {user.name}</span>
+                <Button variant="outline" size="sm" onClick={signOut}>Sign Out</Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link href="/signin">
+                  <Button variant="outline" size="sm">Sign In</Button>
+                </Link>
+                <Link href="/signup">
+                  <Button size="sm" className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">Sign Up</Button>
+                </Link>
+              </div>
+            )}
           </nav>
         </div>
       </header>
