@@ -6,11 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Building2, Bot, Smartphone, Heart, ArrowRight, CheckCircle, Sparkles, Users, Clock, Shield } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { TutorialOverlay, TutorialTrigger } from "@/components/Tutorial/TutorialOverlay";
 import { useAuth0 } from "@auth0/auth0-react";
 
 export default function LandingPage() {
   const { isAuthenticated, user, loginWithRedirect, logout, isLoading } = useAuth0();
+  const [aboutOpen, setAboutOpen] = useState(false);
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Header */}
@@ -27,7 +30,7 @@ export default function LandingPage() {
           <nav className="hidden md:flex items-center space-x-8">
             <Link href="#features" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">Features</Link>
             <Link href="#how-it-works" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">How it Works</Link>
-            <Link href="#about" className="text-gray-600 hover:text-blue-600 transition-colors font-medium">About</Link>
+            <button onClick={() => setAboutOpen(true)} className="text-gray-600 hover:text-blue-600 transition-colors font-medium">About</button>
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
                 <span className="text-gray-700 text-sm">Hi, {user?.name || user?.email}</span>
@@ -338,6 +341,18 @@ export default function LandingPage() {
         </div>
       </footer>
       
+      {/* About Dialog */}
+      <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>About</DialogTitle>
+            <DialogDescription>
+              made by fun people : Anuva Smrithi and Shreyas
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
       {/* Tutorial Components */}
       <TutorialOverlay currentPage="landing" />
       <TutorialTrigger />
